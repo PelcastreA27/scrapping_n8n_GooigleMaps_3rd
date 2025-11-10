@@ -30,7 +30,7 @@ It was implemented as a **practice project** to explore data automation, web scr
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/<your-username>/<repo-name>.git
+   git clone https://github.com/PelcastreA27/scrapping_n8n_GooigleMaps_3rd.git
    cd <repo-name>
    ```
 
