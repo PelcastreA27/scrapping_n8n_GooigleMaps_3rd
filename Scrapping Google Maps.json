@@ -1,0 +1,863 @@
+{
+  "name": "Scrapping Google Maps",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "0505f2eb-dc2f-401a-a941-133eb6667dc5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -1936,
+        336
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "de704919-205a-470f-a417-b297fbbdbaf8",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "SUCCEEDED"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "740661dd-4408-4d60-b046-277ebc3d055b",
+      "name": "Loop Until Complete",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -848,
+        336
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU",
+          "mode": "list",
+          "cachedResultName": "scrappinglocal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Query",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "ece0ae13-f9f6-4f18-b3b2-c1393911c48a",
+      "name": "Read Pending Queries",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -1728,
+        336
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XIeLRKl6J0J43wVj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "a6ff0bab-1ef4-409e-aad3-272084f7673a",
+      "name": "Wait for Job Succeed",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -1280,
+        336
+      ],
+      "webhookId": "97a65079-8ee5-45a2-9de0-afd263bbbe34",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/actor-runs/{{ $json.data.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "9473cd36-3ab1-49fa-9727-8e5914a109a0",
+      "name": "Check Scraping Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1056,
+        272
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Z84x0KiMYWoAyPxj",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $json.data.defaultDatasetId }}/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "4814ccda-125c-40ab-9255-3181fc7c1fc5",
+      "name": "Fetch Scraped Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -624,
+        336
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Z84x0KiMYWoAyPxj",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU",
+          "mode": "list",
+          "cachedResultName": "scrappinglocal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1948906848,
+          "mode": "list",
+          "cachedResultName": "Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit#gid=1948906848"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.title }}",
+            "categoryName": "={{ $json.categoryName }}",
+            "address": "={{ $json.address }}",
+            "phone": "={{ $json.phone }}",
+            "website": "={{ $json.website }}",
+            "searchString": "={{ $('Read Pending Queries').item.json.Query }},{{ $('Read Pending Queries').item.json.Location }}",
+            "status": "={{ $('Check Scraping Status').item.json.data.isStatusMessageTerminal }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "searchString",
+              "displayName": "searchString",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "020b0d33-369d-4fc7-8a67-36d68092ee77",
+      "name": "Save Business Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -400,
+        336
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XIeLRKl6J0J43wVj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "2218f0be-2c48-4a1a-bd21-8bdb67c495a1",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.website }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6650af65-7416-481a-978f-0c4f472332a2",
+      "name": "Filter Businesses with Websites",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        -176,
+        336
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "8c8c89a7-e61d-4403-95bd-749fdb9ba8ed",
+      "name": "Batch Processing Logic",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        48,
+        336
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.website }}\",\n  \"formats\": [\n    \"html\"\n  ]\n}",
+        "options": {}
+      },
+      "id": "729fd286-accd-43e7-896e-674e9f8d19d3",
+      "name": "Scrape Website Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        336,
+        240
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "szT24DO705cGRZxn",
+          "name": "Bearer Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N Code Node - Extract emails, LinkedIn, Facebook, Instagram for single item\nconst item = $input.first();\n\n// Get the text content to search (adjust field names as needed)\nconst textContent = item.json.data.html;\n\n// Initialize result object\nconst result = {\n  website: $('Batch Processing Logic').first().json.website,\n  emails: \"None\",\n  linkedin: \"None\", \n  facebook: \"None\",\n  instagram: \"None\",\n  twitter: \"None\"\n};\n\n// Email extraction regex - matches common email patterns\nconst emailRegex = /\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b/gi;\nconst emails = textContent.match(emailRegex);\n\nif (emails && emails.length > 0) {\n  // Remove duplicates and filter out common non-email matches\n  const uniqueEmails = [...new Set(emails)].filter(email => {\n    const lowerEmail = email.toLowerCase();\n    return !lowerEmail.includes('example.com') && \n           !lowerEmail.includes('test@') &&\n           !lowerEmail.includes('noreply@') &&\n           !lowerEmail.includes('no-reply@') &&\n           lowerEmail.length > 5;\n  });\n  \n  if (uniqueEmails.length > 0) {\n    result.emails = uniqueEmails.length === 1 ? uniqueEmails[0] : uniqueEmails.join(', ');\n  }\n}\n\n// LinkedIn extraction - improved pattern\nconst linkedinRegex = /(?:https?:\\/\\/)?(?:www\\.)?linkedin\\.com\\/(?:in\\/|company\\/|pub\\/)[a-zA-Z0-9\\-._]+\\/?/gi;\nconst linkedinMatches = textContent.match(linkedinRegex);\nif (linkedinMatches && linkedinMatches.length > 0) {\n  const cleanLinkedin = linkedinMatches[0].replace(/^(?:https?:\\/\\/)?(?:www\\.)?/i, 'https://www.');\n  result.linkedin = cleanLinkedin;\n}\n\n// Facebook extraction - improved to match numeric IDs and usernames\nconst facebookRegex = /(?:https?:\\/\\/)?(?:www\\.|m\\.|mobile\\.)?facebook\\.com\\/(?:[^\\/\\s]+\\/)*[^\\/\\s?#]+/gi;\nconst facebookMatches = textContent.match(facebookRegex);\nif (facebookMatches && facebookMatches.length > 0) {\n  const cleanFacebook = facebookMatches[0].replace(/^(?:https?:\\/\\/)?(?:www\\.)?/i, 'https://www.');\n  result.facebook = cleanFacebook;\n}\n\n// Instagram extraction - improved to match various URL formats\nconst instagramRegex = /(?:https?:\\/\\/)?(?:www\\.)?instagram\\.com\\/[a-zA-Z0-9\\-._]+\\/?/gi;\nconst instagramMatches = textContent.match(instagramRegex);\nif (instagramMatches && instagramMatches.length > 0) {\n  const cleanInstagram = instagramMatches[0].replace(/^(?:https?:\\/\\/)?(?:www\\.)?/i, 'https://www.');\n  result.instagram = cleanInstagram;\n}\n\n// Twitter/X extraction - improved to match usernames properly\nconst twitterRegex = /(?:https?:\\/\\/)?(?:www\\.)?(?:twitter\\.com|x\\.com)\\/[a-zA-Z0-9_]+\\/?/gi;\nconst twitterMatches = textContent.match(twitterRegex);\nif (twitterMatches && twitterMatches.length > 0) {\n  const cleanTwitter = twitterMatches[0].replace(/^(?:https?:\\/\\/)?(?:www\\.)?/i, 'https://www.');\n  result.twitter = cleanTwitter;\n}\n\n// Alternative extraction for social handles without full URLs\n// Look for @username patterns for Instagram and Twitter\nif (result.instagram === \"None\") {\n  const igHandleRegex = /@([a-zA-Z0-9._]{1,30})/gi;\n  const igHandles = textContent.match(igHandleRegex);\n  if (igHandles && igHandles.length > 0) {\n    const username = igHandles[0].replace('@', '');\n    if (username.length > 0 && !username.includes(' ')) {\n      result.instagram = `https://www.instagram.com/${username}`;\n    }\n  }\n}\n\n// Look for Twitter handles without full URLs\nif (result.twitter === \"None\") {\n  const twitterHandleRegex = /@([a-zA-Z0-9_]{1,15})/gi;\n  const twitterHandles = textContent.match(twitterHandleRegex);\n  if (twitterHandles && twitterHandles.length > 0) {\n    const username = twitterHandles[0].replace('@', '');\n    if (username.length > 0 && !username.includes(' ')) {\n      result.twitter = `https://www.x.com/${username}`;\n    }\n  }\n}\n\n// Clean up URLs - remove trailing slashes and parameters\n['linkedin', 'facebook', 'instagram', 'twitter'].forEach(platform => {\n  if (result[platform] !== \"None\") {\n    result[platform] = result[platform].split('?')[0].split('#')[0].replace(/\\/$/, '');\n  }\n});\n\nreturn result;"
+      },
+      "id": "33302f38-fe4d-438a-a9b7-a8fa523b5f7e",
+      "name": "Extract Contact Information",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        544,
+        240
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU",
+          "mode": "list",
+          "cachedResultName": "scrappinglocal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2056137853,
+          "mode": "list",
+          "cachedResultName": "Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit#gid=2056137853"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "website": "={{ $json.website }}",
+            "emails": "={{ $json.emails }}",
+            "linkedin": "={{ $json.linkedin }}",
+            "facebook": "={{ $json.facebook }}",
+            "instagram": "={{ $json.instagram }}",
+            "twitter": "={{ $json.twitter }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "emails",
+              "displayName": "emails",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin",
+              "displayName": "linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "facebook",
+              "displayName": "facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "instagram",
+              "displayName": "instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "twitter",
+              "displayName": "twitter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "41385f0a-ee82-409c-8954-2e6a9dd42597",
+      "name": "Save Contact Details",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        768,
+        240
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XIeLRKl6J0J43wVj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU",
+          "mode": "list",
+          "cachedResultName": "scrappinglocal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Query",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dI3wAEJCA9sZ32ix0ep2W-tVJkeg7BGTpp1DAHrtVuU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "true",
+            "row_number": "={{ $('Read Pending Queries').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Query",
+              "displayName": "Query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d939d71e-6dce-415f-8600-ddfd4fc8ff08",
+      "name": "Mark as Processed",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        992,
+        304
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XIeLRKl6J0J43wVj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🚀 INITIALIZATION PHASE\n- Triggers every 30 minutes\n- Reads unprocessed records from [Google Sheet](https://docs.google.com/spreadsheets/d/1DHezdcetT0c3Ie1xB3z3jDc5WElsLN87K4J9EQDef9g/edit?usp=sharing)\n- Starts Google Places scraper for restaurants\n- Waits for completion",
+        "height": 180,
+        "width": 640,
+        "color": 4
+      },
+      "id": "b27b190b-90ba-479e-9529-c03dae50c7fd",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1920,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 📊 DATA COLLECTION PHASE\n- Monitors scraper job status\n- Loops until job completes\n- Fetches scraped restaurant data\n- Saves to \"Data\" sheet in [Google Sheets](https://docs.google.com/spreadsheets/d/1DHezdcetT0c3Ie1xB3z3jDc5WElsLN87K4J9EQDef9g/edit?usp=sharing)",
+        "height": 180,
+        "width": 660
+      },
+      "id": "60651cc7-8941-43ad-b2e8-2a10e0167ae6",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1008,
+        48
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🌐 WEBSITE PROCESSING PHASE\n- Filters restaurants with valid websites\n- Loops through each website\n- Scrapes website content with Firecrawl\n- Extracts contact information (emails, social media)\n- Saves to \"Details\" sheet and marks as processed",
+        "height": 200,
+        "width": 740,
+        "color": 6
+      },
+      "id": "dcc1c357-847b-4120-8e90-48f086eae77f",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🔄 LOOPS\n**Status Check Loop**: Continues until scraper job is complete\n**Website Processing Loop**: Processes each restaurant website individually",
+        "height": 120,
+        "width": 580
+      },
+      "id": "27bc974a-dc45-4344-bda0-fd81465ab738",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/compass~crawler-google-places/runs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"searchStringsArray\": [\n    \"{{ $json.Query }}\"\n  ],\n  \"locationQuery\": \"{{ $json.Location }}\",\n  \"maxCrawledPlacesPerSearch\": 15,\n  \"language\": \"en\",\n  \"maximumLeadsEnrichmentRecords\": 0,\n  \"maxImages\": 0\n}",
+        "options": {}
+      },
+      "id": "d8e8b31d-6b76-47e9-bce7-58c8f3226465",
+      "name": "BearerAuth-Apify",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -1504,
+        336
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "Z84x0KiMYWoAyPxj",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Read Pending Queries": [
+      {
+        "json": {
+          "row_number": 2,
+          "Query": "restaurants",
+          "Location": "San Jose Costarica ",
+          "Status": false,
+          "col_4": "",
+          "col_5": "",
+          "col_6": "",
+          "col_7": "",
+          "col_8": "You can make a copy of this sheet and use your google sheet - if you need help you can reach out to nchoudhary110792@gmail.com"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Pending Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Processed": {
+      "main": [
+        [
+          {
+            "node": "Batch Processing Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Business Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Businesses with Websites",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Until Complete": {
+      "main": [
+        [
+          {
+            "node": "Wait for Job Succeed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Scraped Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Pending Queries": {
+      "main": [
+        [
+          {
+            "node": "BearerAuth-Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Contact Details": {
+      "main": [
+        [
+          {
+            "node": "Mark as Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Job Succeed": {
+      "main": [
+        [
+          {
+            "node": "Check Scraping Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Scraping Status": {
+      "main": [
+        [
+          {
+            "node": "Loop Until Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Scraped Results": {
+      "main": [
+        [
+          {
+            "node": "Save Business Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch Processing Logic": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Scrape Website Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Website Content": {
+      "main": [
+        [
+          {
+            "node": "Extract Contact Information",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Contact Information": {
+      "main": [
+        [
+          {
+            "node": "Save Contact Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Businesses with Websites": {
+      "main": [
+        [
+          {
+            "node": "Batch Processing Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BearerAuth-Apify": {
+      "main": [
+        [
+          {
+            "node": "Wait for Job Succeed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fd08fbe3-4827-4e9c-8d6f-3391e7d95662",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bc62082185cc8475d4a0af325cdad3a0b31c3c6c59d8bcf32687269aacde71ea"
+  },
+  "id": "eMRtqUqGQLRttMPl",
+  "tags": []
+}
